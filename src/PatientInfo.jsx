@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 
+const BE_API = "";
+
 const PatientInfo = () => {
   // const [code, setCode] = useState("");
   const location = useLocation();
@@ -18,6 +20,21 @@ const PatientInfo = () => {
   //   : "http://localhost:3000";
 
   const authorizeLink = `https://fhir.epic.com/interconnect-fhir-oauth/oauth2/authorize?response_type=code&redirect_uri=${redirect}&client_id=${clientId}&state=1234&scope=patient.read, patient.search`;
+
+  const sendAccessTokenToBE = (accessToken) => {
+    if (BE_API) {
+      axios
+        .post(BE_API, {
+          accessToken,
+        })
+        .then(() => {
+          console.log("Acess token sent successfully");
+        })
+        .catch((err) => {
+          console.log("Error in sending access token: ", err);
+        });
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,6 +56,7 @@ const PatientInfo = () => {
           config
         );
         setAccessToken(response.data.access_token);
+        sendAccessTokenToBE(response.data.access_token);
         setPatient(response.data.patient);
       } catch (error) {
         console.log(error);
